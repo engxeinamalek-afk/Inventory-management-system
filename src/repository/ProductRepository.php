@@ -1,0 +1,22 @@
+<?php
+namespace App\repository;
+use PDO;
+class ProductRepository{
+    public function __construct(Private PDO $PDO)
+    {}
+    public function create($product){
+        $sql = "INSERT INTO products (name, price) VALUES (:name, :price)";
+        
+        $stmt = $this->PDO->prepare($sql);
+        
+        $stmt->execute([
+            ':name'  => $product->name,
+            ':price' => $product->price
+        ]);
+        
+        return (int)$this->PDO->lastInsertId();
+    }
+    public function update(){
+        // تعديل السعر
+    }
+}
