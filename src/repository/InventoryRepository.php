@@ -31,6 +31,25 @@ class InventoryRepository{
         ]);
     }
 
+    public function getQuantity(int $productId): int {
+        $stmt = $this->PDO->prepare("
+            SELECT current_quantity 
+            FROM inventory 
+            WHERE product_id = :product_id 
+            LIMIT 1
+        ");
+        
+        $stmt->execute([':product_id' => $productId]);
+        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return -1;
+        }
+
+        return (int) $row['current_quantity'];
+    }
+
+
     public function decreaseStock(int $productId, int $quantity): bool {
         $stmt = $this->PDO->prepare("
             UPDATE inventory 

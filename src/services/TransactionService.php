@@ -18,6 +18,13 @@ class TransactionService{
             return 0;
         }
 
+        if ($transaction->type === 'sale') {
+            $availableStock = $this->inventoryRepo->getQuantity($transaction->productId);
+            if ($availableStock < $transaction->quantity) {
+                return 0; // الكمية مو كافية
+            }
+        }
+
         if ($transaction->type === 'purchase') {
             if (!$this->supplierRepo->checkRelation($transaction->productId, $transaction->supplierId)) {
                 return 0;
