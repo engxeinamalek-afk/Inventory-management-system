@@ -16,7 +16,17 @@ class ProductRepository{
         
         return (int)$this->PDO->lastInsertId();
     }
-    public function update(){
-        // تعديل السعر
+
+    public function update(int $id, float $newPrice): bool {
+        $sql = "UPDATE products SET price = :price WHERE id = :id";
+        
+        $stmt = $this->PDO->prepare($sql);
+        
+        $stmt->execute([
+            ':id'    => $id,
+            ':price' => $newPrice
+        ]);
+        return $stmt->rowCount() > 0;
     }
+
 }

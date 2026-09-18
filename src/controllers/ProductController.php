@@ -8,9 +8,11 @@ use App\services\ProductService;
 
 class ProductController{
     private ProductService $service;
+    private ProductRepository $repo;
     public function __construct(private $container)
     {
         $this->service= $container->get(ProductService::class);
+        $this->repo= $container->get(ProductRepository::class);
     }
     // اضافة منتج
     public function store($request){
@@ -19,7 +21,7 @@ class ProductController{
         $this->service->store($product);
     }
     // تعديل سعر منتج
-    public function update(){
-        // يتضمن التحقق ان المنتج موجود اصلا => سيرفس
+    public function update($request , $id){
+        $this->repo->update($id, $request['newPrice']);
     }
 }
