@@ -17,8 +17,30 @@ class InventoryRepository{
         
         return (int)$this->PDO->lastInsertId();
     }
-    // تحديث مخزون
-    public function update(){
+
+    public function increaseStock(int $productId, int $quantity): bool {
+        $stmt = $this->PDO->prepare("
+            UPDATE inventory 
+            SET current_quantity = current_quantity + :quantity 
+            WHERE product_id = :product_id
+        ");
         
+        return $stmt->execute([
+            ':product_id' => $productId,
+            ':quantity'   => $quantity
+        ]);
+    }
+
+    public function decreaseStock(int $productId, int $quantity): bool {
+        $stmt = $this->PDO->prepare("
+            UPDATE inventory 
+            SET current_quantity = current_quantity - :quantity 
+            WHERE product_id = :product_id
+        ");
+        
+        return $stmt->execute([
+            ':product_id' => $productId,
+            ':quantity'   => $quantity
+        ]);
     }
 }

@@ -25,6 +25,7 @@ class TransactionController{
                                     $request['quantity'],
                                     $price,
                                     $request['supplier_id']);
+        $this->service->store($tarnsaction);
         
     }
 }

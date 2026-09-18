@@ -38,4 +38,18 @@ class ProductRepository{
         return true;
     }
 
+    public function getPrice(int $id) {
+        $stmt = $this->PDO->prepare("SELECT price FROM products WHERE id = :id LIMIT 1");
+        $stmt->execute(['id' => $id]);
+        
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            return false; 
+        }
+        
+        return (float) $row['price'];
+    }
+
+
 }

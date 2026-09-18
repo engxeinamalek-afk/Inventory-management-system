@@ -42,4 +42,25 @@ class SupplierRepository{
             ':update_price'       => $price,
         ]);
     }
+
+    public function checkRelation(int $productId, ?int $supplierId): bool {
+        if ($supplierId === null) {
+            return false;
+        }
+
+        $stmt = $this->PDO->prepare("
+            SELECT 1 
+            FROM product_suppliers 
+            WHERE product_id = :product_id AND supplier_id = :supplier_id 
+            LIMIT 1
+        ");
+        
+        $stmt->execute([
+            ':product_id'  => $productId,
+            ':supplier_id' => $supplierId
+        ]);
+
+        return (bool) $stmt->fetch();
+    }
+
 }
