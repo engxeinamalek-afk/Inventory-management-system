@@ -29,4 +29,13 @@ class ProductRepository{
         return $stmt->rowCount() > 0;
     }
 
+    public function find(int $id): bool {
+        $stmt = $this->PDO->prepare("SELECT * FROM products WHERE id = :id LIMIT 1");
+        $stmt->execute(['id' => $id]);
+        $row = $stmt->fetch();
+
+        if (!$row) return false;
+        return true;
+    }
+
 }
