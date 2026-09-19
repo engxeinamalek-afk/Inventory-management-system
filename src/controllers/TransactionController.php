@@ -18,14 +18,31 @@ class TransactionController{
     }
     //عمليات البيع والشراء
     public function store(array $request, $id){
-        // اضافة سجل وتحديث الكمية => سيرفس وترانزاكشن
-        $price= $this->productRepo->getPrice($id);
         $tarnsaction= new Transaction($id,
                                     $request['type'],
                                     $request['quantity'],
-                                    $price,
                                     $request['supplier_id']);
-        $this->service->store($tarnsaction);
+        try{
+            $this->service->store($tarnsaction);
+            return [
+                "status" => 201,
+                "success" => true,
+                "message" => "Transaction created successfully!"
+            ];
+        }catch (\PDOException $e) {
+            return [
+                "status"  => 500,
+                "success" => false,
+                "message" => "A database error occurred while processing the transaction."
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                "status"  => 400,
+                "success" => false,
+                "message" => $e->getMessage()
+            ];
+        }
         
     }
 }

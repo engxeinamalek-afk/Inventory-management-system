@@ -6,42 +6,46 @@ use App\repository\ProductRepository;
 use App\repository\SupplierRepository;
 use App\repository\TransactionRepository;
 use App\entities\Transaction;
+use Exception;
+use PDO;
 
 class TransactionService{
     public function __construct(private ProductRepository $productRepo,
                                 private SupplierRepository $supplierRepo,
                                 private TransactionRepository $transactionRepo,
-                                private InventoryRepository $inventoryRepo)
+                                private InventoryRepository $inventoryRepo,
+                                private PDO $pdo)
     {}
-    public function store(Transaction $transaction): int {
-        if (!$this->productRepo->find($transaction->productId)) {
-            return 0;
-        }
+    public function store(Transaction $transaction){
+        try{
+            $this->pdo->beginTransaction();
+            $this->productRepo->find($transaction->productId);
 
-        if ($transaction->type === 'sale') {
-            $availableStock = $this->inventoryRepo->getQuantity($transaction->productId);
-            if ($availableStock < $transaction->quantity) {
-                return 0; // الكمية مو كافية
+            if ($transaction->type === 'sale'){
+                $availableStock = $this->inventoryRepo->getQuantity($transaction->productId);
+                if ($availableStock < $transaction->quantity)
+                    throw new Exception("The quantity in not available!");
+                $transaction->unitPrice = $this->productRepo->getPrice($transaction->productId);
             }
-        }
 
-        if ($transaction->type === 'purchase') {
-            if (!$this->supplierRepo->checkRelation($transaction->productId, $transaction->supplierId)) {
-                return 0;
+            if ($transaction->type === 'purchase'){
+                $this->supplierRepo->checkRelation($transaction->productId, $transaction->supplierId); 
+                $transaction->unitPrice = $this->supplierRepo->getPrice($transaction->productId , $transaction->supplierId);
             }
-        }
 
-        $transactionId = $this->transactionRepo->create($transaction);
+            $transaction->setTotelPrice();
+            $this->transactionRepo->create($transaction);
 
-        if ($transactionId > 0) {
             if ($transaction->type === 'sale') {
                 $this->inventoryRepo->decreaseStock($transaction->productId, $transaction->quantity);
             } else {
                 $this->inventoryRepo->increaseStock($transaction->productId, $transaction->quantity);
             }
+            $this->pdo->commit();
+        }catch(Exception $e){
+            $this->pdo->rollBack();
+            
+            throw $e;
         }
-
-        return $transactionId;
     }
-
 }
