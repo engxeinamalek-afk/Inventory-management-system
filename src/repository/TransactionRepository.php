@@ -14,7 +14,7 @@ class TransactionRepository{
         $stmt->execute([
             ':product_id'  => $transaction->productId,
             ':supplier_id' => $transaction->supplierId,
-            ':type'        => $transaction->type,
+            ':type'        => $transaction->type->value,
             ':quantity'    => $transaction->quantity,
             ':unit_price'  => $transaction->unitPrice,
             ':total_price' => $transaction->totalPrice,

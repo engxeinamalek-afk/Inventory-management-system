@@ -21,14 +21,14 @@ class TransactionService{
             $this->pdo->beginTransaction();
             $this->productRepo->find($transaction->productId);
 
-            if ($transaction->type === 'sale'){
+            if ($transaction->type->value === 'sale'){
                 $availableStock = $this->inventoryRepo->getQuantity($transaction->productId);
                 if ($availableStock < $transaction->quantity)
                     throw new Exception("The quantity in not available!");
                 $transaction->unitPrice = $this->productRepo->getPrice($transaction->productId);
             }
 
-            if ($transaction->type === 'purchase'){
+            if ($transaction->type->value === 'purchase'){
                 $this->supplierRepo->checkRelation($transaction->productId, $transaction->supplierId); 
                 $transaction->unitPrice = $this->supplierRepo->getPrice($transaction->productId , $transaction->supplierId);
             }
