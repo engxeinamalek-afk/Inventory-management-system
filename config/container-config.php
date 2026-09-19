@@ -28,14 +28,18 @@ $container->set(TransactionRepository::class, function($c) {
     return new TransactionRepository($c->get('PDO')); 
 });
 $container->set(ProductService::class, function($c){
-    return new ProductService( $c->get(ProductRepository::class) ,$c->get(InventoryRepository::class) );
+    return new ProductService( $c->get(ProductRepository::class),
+                               $c->get(InventoryRepository::class),
+                               $c->get('PDO') );
 });
 $container->set(SupplierPriceService::class, function($c){
-    return new SupplierPriceService( $c->get(ProductRepository::class) ,$c->get(SupplierRepository::class) );
+    return new SupplierPriceService( $c->get(ProductRepository::class),
+                                     $c->get(SupplierRepository::class));
 });
 $container->set(TransactionService::class, function($c){
     return new TransactionService( $c->get(ProductRepository::class) ,
                                     $c->get(SupplierRepository::class),
                                     $c->get(TransactionRepository::class),
-                                    $c->get(InventoryRepository::class) );
+                                    $c->get(InventoryRepository::class),
+                                    $c->get('PDO') );
 });
