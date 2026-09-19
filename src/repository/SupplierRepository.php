@@ -2,6 +2,8 @@
 namespace App\repository;
 use PDO;
 use App\entities\Supplier;
+use Exception;
+
 class SupplierRepository{
     public function __construct(Private PDO $PDO)
     {}
@@ -15,27 +17,29 @@ class SupplierRepository{
             ':name'  => $supplier->name,
             ':phone' => $supplier->phone
         ]);
-        
-        return (int)$this->PDO->lastInsertId();
     }
 
+    // التححق من وجود المصدر
     public function find(int $id): bool {
         $stmt = $this->PDO->prepare("SELECT * FROM suppliers WHERE id = :id LIMIT 1");
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
 
-        if (!$row) return false;
+        if (!$row) {
+            throw new \Exception("Supplier with ID {$id} not found.");
+        }
         return true;
     }
 
-    public function add(int $productId, int $supplierId, float $price): bool {
+    // اضافة سعر منتج من مصدر محدد
+    public function add(int $productId, int $supplierId, float $price) {
         $stmt = $this->PDO->prepare("
             INSERT INTO product_suppliers (product_id, supplier_id, supplier_price) 
             VALUES (:product_id, :supplier_id, :price)
             ON DUPLICATE KEY UPDATE supplier_price = :update_price
         ");
         
-        return $stmt->execute([
+        $stmt->execute([
             ':product_id'  => $productId,
             ':supplier_id' => $supplierId,
             ':price'       => $price,
@@ -43,24 +47,33 @@ class SupplierRepository{
         ]);
     }
 
-    public function checkRelation(int $productId, ?int $supplierId): bool {
-        if ($supplierId === null) {
-            return false;
-        }
-
+    public function checkRelation(int $productId, ?int $supplierId){
+        if ($supplierId === null) 
+            throw new Exception("Supplier not found");
         $stmt = $this->PDO->prepare("
             SELECT 1 
             FROM product_suppliers 
             WHERE product_id = :product_id AND supplier_id = :supplier_id 
             LIMIT 1
         ");
-        
         $stmt->execute([
             ':product_id'  => $productId,
             ':supplier_id' => $supplierId
         ]);
-
-        return (bool) $stmt->fetch();
+        $exists = $stmt->fetch();
+        if (!$exists)
+            throw new \Exception("Relation between product ID {$productId} and supplier ID {$supplierId} not found.");
     }
 
+    public function getPrice(int $productId, int $supplierId) {
+        $stmt = $this->PDO->prepare("SELECT supplier_price FROM product_suppliers WHERE product_id = :productId AND supplier_id = :supplierId LIMIT 1");
+        $stmt->execute([
+            'productId' => $productId,
+            'supplierId' => $supplierId
+        ]);
+        
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        return (float) $row['price'];
+    }
 }

@@ -5,13 +5,13 @@ use App\entities\Transaction;
 class TransactionRepository{
     public function __construct(Private PDO $PDO)
     {}
-    public function create(Transaction $transaction): int {
+    public function create(Transaction $transaction){
         $stmt = $this->PDO->prepare("
             INSERT INTO transactions (product_id, supplier_id, type, quantity, unit_price, total_price, date) 
             VALUES (:product_id, :supplier_id, :type, :quantity, :unit_price, :total_price, :date)
         ");
 
-        $success = $stmt->execute([
+        $stmt->execute([
             ':product_id'  => $transaction->productId,
             ':supplier_id' => $transaction->supplierId,
             ':type'        => $transaction->type,
@@ -20,12 +20,6 @@ class TransactionRepository{
             ':total_price' => $transaction->totalPrice,
             ':date'        => $transaction->date
         ]);
-
-        if (!$success) {
-            return 0;
-        }
-
-        return (int)$this->PDO->lastInsertId();
     }
 
 }
