@@ -9,15 +9,10 @@ use App\exceptions\ValidationException;
 use Exception;
 
 class SupplierController{
-    private SupplierRepository $repo;
-    private SupplierPriceService $service;
-    private Validator $validator;
-    public function __construct($container)
-    {
-        $this->repo= $container->get(SupplierRepository::class);
-        $this->service= $container->get(SupplierPriceService::class);
-        $this->validator= $container->get(Validator::class);
-    }
+
+    public function __construct(private SupplierRepository $repo,
+                                private SupplierPriceService $service,
+                                private Validator $validator){}
     //اضافة مصدر
     public function store($request){
         try{

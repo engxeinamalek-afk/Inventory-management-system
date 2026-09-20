@@ -30,7 +30,7 @@ if ($matchedHandler) {
     [$controllerClass, $action] = explode('@', $matchedHandler);
     
     if (class_exists($controllerClass)) {
-        $controllerInstance = new $controllerClass($container); 
+        $controllerInstance = $container->get($controllerClass); 
         
         $response = $controllerInstance->$action($requestData, ...$urlParams);
         

@@ -9,15 +9,10 @@ use App\services\ProductService;
 use Exception;
 
 class ProductController{
-    private ProductService $service;
-    private ProductRepository $repo;
-    private Validator $validator;
-    public function __construct(private $container)
-    {
-        $this->service= $container->get(ProductService::class);
-        $this->repo= $container->get(ProductRepository::class);
-        $this->validator= $container->get(Validator::class);
-    }
+
+    public function __construct(private ProductService $service,
+                                private ProductRepository $repo,
+                                private Validator $validator){}
     // اضافة منتج
     public function store($request){
         //هون لازم اعمل فاليديشن

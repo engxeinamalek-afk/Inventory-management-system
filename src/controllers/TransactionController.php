@@ -10,17 +10,11 @@ use App\factories\TransactionStrategyFactory;
 use App\repository\TransactionRepository;
 
 class TransactionController{
-    private TransactionService $service;
-    private Validator $validator;
-    private TransactionStrategyFactory $factory;
-    private TransactionRepository $repo;
-    public function __construct($container)
-    {
-        $this->service= $container->get(TransactionService::class);
-        $this->validator= $container->get(Validator::class);
-        $this->factory =$container->get(TransactionStrategyFactory::class);
-        $this->repo= $container->get(TransactionRepository::class);
-    }
+
+    public function __construct(private TransactionService $service,
+                                private Validator $validator,
+                                private TransactionStrategyFactory $factory,
+                                private TransactionRepository $repo){}
     //عمليات البيع والشراء
     public function store(array $request, $id){
         try{
