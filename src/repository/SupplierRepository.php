@@ -74,6 +74,6 @@ class SupplierRepository{
         
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         
-        return (float) $row['price'];
+        return (float) $row['supplier_price'];
     }
 }
