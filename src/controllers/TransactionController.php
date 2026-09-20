@@ -7,16 +7,19 @@ use App\entities\enums\TransactionType;
 use App\exceptions\ValidationException;
 use App\factories\TransactionFactory;
 use App\factories\TransactionStrategyFactory;
+use App\repository\TransactionRepository;
 
 class TransactionController{
     private TransactionService $service;
     private Validator $validator;
     private TransactionStrategyFactory $factory;
+    private TransactionRepository $repo;
     public function __construct($container)
     {
         $this->service= $container->get(TransactionService::class);
         $this->validator= $container->get(Validator::class);
         $this->factory =$container->get(TransactionStrategyFactory::class);
+        $this->repo= $container->get(TransactionRepository::class);
     }
     //عمليات البيع والشراء
     public function store(array $request, $id){
@@ -61,5 +64,25 @@ class TransactionController{
             ];
         }
         
+    }
+
+    public function getPurchases() 
+    {
+        $purchases = $this->repo->getPurchases();
+        
+        return [
+            'status' => 'success',
+            'data'   => $purchases
+        ];
+    }
+
+    public function getSales() 
+    {
+        $sales = $this->repo->getSales();
+        
+        return [
+            'status' => 'success',
+            'data'   => $sales
+        ];
     }
 }
