@@ -13,6 +13,6 @@ class TransactionFactory
         return new Transaction($id,
                                 $typeEnum,
                                 $data['quantity'],
-                                $data['supplier_id']);
+                                $typeEnum->extractSupplierId($data));
     }
 }
