@@ -12,6 +12,10 @@ class SaleTransactionStrategy implements TransactionStrategyInterface
         private InventoryRepository $inventoryRepo,
         private ProductRepository $productRepo
     ) {}
+    public function validateRules(): array
+    {
+        return [];
+    }
     public function process(Transaction $transaction): void 
     {
         $availableStock = $this->inventoryRepo->getQuantity($transaction->productId);

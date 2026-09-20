@@ -11,6 +11,10 @@ class PurchaseTransactionStrategy implements TransactionStrategyInterface
         private SupplierRepository $supplierRepo,
         private InventoryRepository $inventoryRepo
     ) {}
+    public function validateRules(): array
+    {
+        return ['supplier_id' => 'required|integer'];
+    }
     public function process(Transaction $transaction): void 
     {
         $this->supplierRepo->checkRelation($transaction->productId, $transaction->supplierId);

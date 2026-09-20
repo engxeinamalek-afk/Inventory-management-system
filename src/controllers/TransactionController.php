@@ -1,31 +1,37 @@
 <?php
 namespace App\controllers;
-
-use App\entities\Transaction;
 use App\services\TransactionService;
 use App\services\Validator;
 use App\entities\enums\TransactionType;
 
 use App\exceptions\ValidationException;
 use App\factories\TransactionFactory;
+use App\factories\TransactionStrategyFactory;
 
 class TransactionController{
     private TransactionService $service;
     private Validator $validator;
+    private TransactionStrategyFactory $factory;
     public function __construct($container)
     {
         $this->service= $container->get(TransactionService::class);
         $this->validator= $container->get(Validator::class);
+        $this->factory =$container->get(TransactionStrategyFactory::class);
     }
     //عمليات البيع والشراء
     public function store(array $request, $id){
         try{
             $types = implode(',', array_column(TransactionType::cases(), 'value'));
-            $this->validator->validateOrFail($request,[
-                "type" => "required|string|in:".$types,
+            $rules = [
+                "type"     => "required|string|in:" . $types,
                 "quantity" => "required|integer",
-                "supplier_id" => "required|integer"
-            ]);
+            ];
+
+            $strategy = $this->factory->make($request['type'] ?? '');
+            $rules = array_merge($rules, $strategy->validateRules());
+
+            $this->validator->validateOrFail($request, $rules);
+
             $tarnsaction= TransactionFactory::createFromArray($request, $id);
 
             $this->service->store($tarnsaction);
